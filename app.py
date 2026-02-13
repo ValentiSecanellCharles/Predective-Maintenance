@@ -63,4 +63,4 @@ if st.button("Run Economic Analysis"):
             st.write("The machine is within safe parameters.")
 
 st.markdown("---")
-st.caption("Valentí Secanell - Msc Candidate on industrial engineering")
+st.caption("Valentí Secanell - Msc Candidate on Industrial engineering")
