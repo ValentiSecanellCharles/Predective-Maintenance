@@ -6,67 +6,61 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 
-# 1. AIXÒ SEMPRE HA D'ANAR PRIMER (just després dels imports)
-st.set_page_config(page_title="Machine Failure Predictor", page_icon="🛠️")
+# 1. Page Configuration
+st.set_page_config(page_title="Maintenance Cost Optimizer", page_icon="💰")
 
-# 2. Funció per carregar el model amb memòria cau
 @st.cache_resource
 def load_model():
-    # Assegura't que el nom del fitxer coincideix exactament amb el que tens a GitHub
     return joblib.load('predictive_maintenance_model.pkl')
 
-# 3. Intentem carregar el model
-try:
-    model = load_model()
-except Exception as e:
-    st.error(f"Error loading the model: {e}")
-    st.stop()
+model = load_model()
 
-# 4. Disseny de la interfície
-st.title("🛠️ Predictive Maintenance Dashboard")
-st.write("Enter the sensor data to analyze the machine's health status.")
+# 2. Sidebar - Inputs
+st.sidebar.header("Sensor Readings")
+m_type = st.sidebar.selectbox("Machine Type", ["L", "M", "H"])
+air_temp = st.sidebar.number_input("Air temperature [K]", value=300.0)
+proc_temp = st.sidebar.number_input("Process temperature [K]", value=310.0)
+rpm = st.sidebar.number_input("Rotational speed [rpm]", value=1500.0)
+torque = st.sidebar.number_input("Torque [Nm]", value=40.0)
+tool_wear = st.sidebar.number_input("Tool wear [min]", value=0.0)
 
-st.sidebar.header("Input Sensor Readings")
+# 3. Sidebar - Cost Settings (Formal labels)
+st.sidebar.header("Cost Parameters (EUR)")
+cost_failure = st.sidebar.number_input("Cost of Unplanned Failure", value=5000)
+cost_maintenance = st.sidebar.number_input("Cost of Preventive Check", value=500)
 
-def get_user_inputs():
-    m_type = st.sidebar.selectbox("Machine Quality Type", ["L", "M", "H"])
-    air_temp = st.sidebar.number_input("Air temperature [K]", value=300.0)
-    proc_temp = st.sidebar.number_input("Process temperature [K]", value=310.0)
-    rpm = st.sidebar.number_input("Rotational speed [rpm]", value=1500.0)
-    torque = st.sidebar.number_input("Torque [Nm]", value=40.0)
-    tool_wear = st.sidebar.number_input("Tool wear [min]", value=0.0)
+# 4. Main Panel
+st.title("💰 Predictive Maintenance & Economic Impact")
+
+input_data = pd.DataFrame([{
+    'Type': m_type, 'Air temperature [K]': air_temp, 'Process temperature [K]': proc_temp,
+    'Rotational speed [rpm]': rpm, 'Torque [Nm]': torque, 'Tool wear [min]': tool_wear
+}])
+
+if st.button("Run Economic Analysis"):
+    prediction = model.predict(input_data)[0]
+    probability = model.predict_proba(input_data)[0][1]
     
-    data = {
-        'Type': m_type,
-        'Air temperature [K]': air_temp,
-        'Process temperature [K]': proc_temp,
-        'Rotational speed [rpm]': rpm,
-        'Torque [Nm]': torque,
-        'Tool wear [min]': tool_wear
-    }
-    return pd.DataFrame([data])
-
-input_df = get_user_inputs()
-
-# Mostrar les dades actuals
-st.subheader("Current Machine Parameters")
-st.write(input_df)
-
-# 5. Botó d'execució
-if st.button("Run Diagnostic"):
-    prediction = model.predict(input_df)
-    probability = model.predict_proba(input_df)[0][1]
+    col1, col2 = st.columns(2)
     
-    st.subheader("Final Diagnostic")
-    
-    if prediction[0] == 1:
-        st.error(f"⚠️ **CRITICAL:** High risk of failure detected!")
+    with col1:
+        st.subheader("Technical Diagnostic")
+        if prediction == 1:
+            st.error("Status: High Risk")
+        else:
+            st.success("Status: Operational")
         st.write(f"Failure Probability: **{probability:.2%}**")
-        st.warning("Action: Inspect the machine immediately.")
-    else:
-        st.success(f"✅ **NORMAL:** Machine is operating safely.")
-        st.write(f"Probability of failure: **{probability:.2%}**")
-        st.info("Action: No immediate intervention required.")
+
+    with col2:
+        st.subheader("Economic Estimate")
+        # Lògica: Si el model prediu fallada, l'estalvi és el cost de l'avaria menys el manteniment
+        if prediction == 1:
+            savings = cost_failure - cost_maintenance
+            st.metric("Potential Savings", f"{savings}€", delta="Positive Impact")
+            st.write("By intervening now, you avoid a full breakdown cost.")
+        else:
+            st.metric("Risk-Adjusted Cost", "0€", delta="No Action Needed")
+            st.write("The machine is within safe parameters.")
 
 st.markdown("---")
-st.caption("Valentí Secanell Predictive Maintenance System")
+st.caption("Financial estimates based on user-defined cost parameters.")
