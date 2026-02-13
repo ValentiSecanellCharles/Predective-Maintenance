@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 
 # 1. Page Configuration
-st.set_page_config(page_title="Maintenance Cost Optimizer", page_icon="💰")
+st.set_page_config(page_title="Maintenance Cost Optimizer")
 
 @st.cache_resource
 def load_model():
