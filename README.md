@@ -5,7 +5,7 @@
 ## Project Overview
 This project implements a machine learning solution for predictive maintenance based on the AI4I 2020 Predictive Maintenance Dataset. The primary objective is to develop a robust classification model capable of predicting mechanical failures by analyzing real-time sensor data, including temperature, rotational speed, torque, and tool wear.
 
-Live Application: [Predictive Maintenance Dashboard]([https://predective-maintenance-d776wru8db4vgrkemj8jzp.streamlit.app/](https://predective-maintenance-valentisecanell.streamlit.app/))
+Live Application: [Predictive Maintenance Dashboard](https://predective-maintenance-valentisecanell.streamlit.app/)
 
 ## Problem Statement
 In industrial manufacturing, unexpected equipment failure results in substantial operational costs and production downtime. Maintenance strategies are typically categorized into two types:
