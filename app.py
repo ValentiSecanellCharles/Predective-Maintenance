@@ -69,4 +69,4 @@ if st.button("Run Diagnostic"):
         st.info("Action: No immediate intervention required.")
 
 st.markdown("---")
-st.caption("AI4I 2020 Predictive Maintenance System")
+st.caption("Valentí Secanell Predictive Maintenance System")
