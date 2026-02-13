@@ -27,7 +27,7 @@ To ensure the model's reliability in a real-world scenario, rigorous data cleani
 
 
 ## Results and Performance
-* **F1-Score:** Approximately 0.85, demonstrating a balanced trade-off between Precision and Recall.
+* **F1-Score:** Approximately 0.9, demonstrating a balanced trade-off between Precision and Recall.
 * **ROC-AUC:** 0.94, indicating high discriminative power.
 * **Feature Importance:** Torque and Tool Wear were identified as the most significant predictors of equipment failure.
 
@@ -40,7 +40,4 @@ The final model is deployed as an interactive web application via **Streamlit**.
 * `predictive_maintenance_model.pkl`: Serialized model pipeline for production use.
 * `requirements.txt`: Environment dependencies.
 
-## Installation and Local Execution
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
+
