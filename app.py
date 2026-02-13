@@ -1,34 +1,34 @@
-#import streamlit as st
+import streamlit as st
 import pandas as pd
 import joblib
-# Importem aquestes classes perquè el Pipeline les necessita per carregar-se rectament
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 
-# 1. Configuració de la pàgina
+# 1. AIXÒ SEMPRE HA D'ANAR PRIMER (just després dels imports)
 st.set_page_config(page_title="Machine Failure Predictor", page_icon="🛠️")
 
-# 2. Carregar el model
-# El fitxer 'predictive_maintenance_model.pkl' ha d'estar a la mateixa carpeta
+# 2. Funció per carregar el model amb memòria cau
+@st.cache_resource
+def load_model():
+    # Assegura't que el nom del fitxer coincideix exactament amb el que tens a GitHub
+    return joblib.load('predictive_maintenance_model.pkl')
+
+# 3. Intentem carregar el model
 try:
-    model = joblib.load('predictive_maintenance_model.pkl')
+    model = load_model()
 except Exception as e:
     st.error(f"Error loading the model: {e}")
     st.stop()
 
-# 3. Interfície de l'aplicació
+# 4. Disseny de la interfície
 st.title("🛠️ Predictive Maintenance Dashboard")
-st.write("""
-This application uses a Machine Learning model to predict machine failures 
-before they occur, based on real-time sensor data.
-""")
+st.write("Enter the sensor data to analyze the machine's health status.")
 
-st.sidebar.header("Sensor Input Data")
+st.sidebar.header("Input Sensor Readings")
 
-def user_input_features():
-    # He posat els noms exactes que espera el teu Pipeline segons el notebook
+def get_user_inputs():
     m_type = st.sidebar.selectbox("Machine Quality Type", ["L", "M", "H"])
     air_temp = st.sidebar.number_input("Air temperature [K]", value=300.0)
     proc_temp = st.sidebar.number_input("Process temperature [K]", value=310.0)
@@ -46,27 +46,27 @@ def user_input_features():
     }
     return pd.DataFrame([data])
 
-input_df = user_input_features()
+input_df = get_user_inputs()
 
-# 4. Mostrar dades introduïdes
-st.subheader("Current Sensor Readings")
+# Mostrar les dades actuals
+st.subheader("Current Machine Parameters")
 st.write(input_df)
 
-# 5. Predicció
-if st.button("Analyze Machine Status"):
+# 5. Botó d'execució
+if st.button("Run Diagnostic"):
     prediction = model.predict(input_df)
     probability = model.predict_proba(input_df)[0][1]
     
-    st.subheader("Diagnostic Results")
+    st.subheader("Final Diagnostic")
     
     if prediction[0] == 1:
         st.error(f"⚠️ **CRITICAL:** High risk of failure detected!")
         st.write(f"Failure Probability: **{probability:.2%}**")
-        st.info("Recommended Action: Schedule immediate maintenance check.")
+        st.warning("Action: Inspect the machine immediately.")
     else:
-        st.success(f"✅ **NORMAL:** Machine is operating within safe parameters.")
+        st.success(f"✅ **NORMAL:** Machine is operating safely.")
         st.write(f"Probability of failure: **{probability:.2%}**")
-        st.info("Recommended Action: Continue standard monitoring.")
+        st.info("Action: No immediate intervention required.")
 
 st.markdown("---")
-st.caption("Model trained on AI4I 2020 Predictive Maintenance Dataset.")
+st.caption("AI4I 2020 Predictive Maintenance System")
